@@ -37,9 +37,7 @@ def kompare(old_gif,new_gif,length):
 '''
 BYPASS GD IMAGE LIBRARY OF PHP(PoC tool)
 BYPASS GD IMAGE LIBRARY OF PHP(PoC tool)
-BYPASS GD IMAGE LIBRARY OF PHP(PoC tool)
-BYPASS GD IMAGE LIBRARY OF PHP(PoC tool)
-BYPASS GD IMAGE LIBRARY OF PHP(PoC tool)
+
 '''
 
 
@@ -57,5 +55,5 @@ l=len(code.encode('hex'))
 name_of_your_file=args.fileName
 kompare(a,b,l)
 print 'see ',name_of_your_file
-print 'thanks to secgeek'
+
 
