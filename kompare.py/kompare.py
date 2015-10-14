@@ -7,6 +7,7 @@ def payload(stringToreplace,PoCcode,filename,old_gif):
 		f=open(old_gif,'r')
 		filedata=f.read()
 		f.close()
+		print 'poccode' + PoCcode
 		newdata = filedata.replace(stringToreplace,PoCcode)
 		f = open(filename,'w')
 		f.write(newdata)
@@ -17,21 +18,23 @@ def kompare(old_gif,new_gif,length):
 	file1=new_gif
 	file2=old_gif
 	x=""
-	print "match found per",length,"bytes"
+	i=0
+	print "",length,"bytes"
 	with open(file1,'rb') as f:
 		with open(file2,'rb') as f1:
 			while True:
 				c=f.read(length)
 				c1=f1.read(length)
 				if not c:
-					print"end of file"
+					print"end of files"
 					break
 				elif c1==c:
-					print'\n',c.encode('hex')
+					print'\n',c#.encode('hex')
 					x=c
-					print'________________________'
+				
 	print 'value of x(bytes to replace)',x
 	payload(x,code,name_of_your_file,old_gif)
+
 
 
 '''

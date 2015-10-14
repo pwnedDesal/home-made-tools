@@ -103,7 +103,7 @@ def Brute_force(uri,pdata,tp,content_type):
 
 
 
-
+##http://stackoverflow.com/questions/5606083/how-to-set-and-retrieve-cookie-in-http-header-in-python
 
 
 
